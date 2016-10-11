@@ -14,7 +14,7 @@ action :add do
     dns_local_ip = new_resource.dns_local_ip
 
     # Determine if current node is leader
-    bootstrap = system('serf members -tag leader="ready|inprogress" | grep $(hostname -s)')
+    bootstrap = system('serf members -tag leader="ready|inprogress" | grep $(hostname -s) &> /dev/null')
 
     # Check local DNS address
     current_dns = `cat /etc/resolv.conf | grep nameserver | head -n1 | awk {'print $2'}`.chomp
@@ -85,6 +85,8 @@ end
 
 action :remove do
   begin
+    user = new_resource.user
+    group = new_resource.group
     confdir = new_resource.confdir
     datadir = new_resource.datadir
     cdomain = new_resource.cdomain
@@ -110,6 +112,11 @@ action :remove do
 
     template "/etc/resolv.conf" do
       source "resolv.conf.erb"
+      cookbook "consul"
+      owner user
+      group group
+      mode 0644
+      retries 2
       variables(:cdomain => cdomain, :dns_ip => dns_local_ip)
     end
 
