@@ -1,0 +1,18 @@
+{
+  "domain" : "<%= @cdomain %>",
+  "data_dir": "<%= @datadir %>",
+  "log_level": "INFO",
+  "node_name": "<%= @hostname %>",
+  "server": true,
+  "bind_addr" : "<%= @ipaddress %>",
+  "client_addr" : "0.0.0.0",
+  "ports" : {
+    "dns" : 53
+  },
+  <% if @bootstrap %>
+  "bootstrap" : <%= @bootstrap %>,
+  <% else %>
+  "start_join" : <%= @server_list %>,
+  <% end %>
+  "recursors" : [ "<%= @dns_local_ip %>" ]
+}

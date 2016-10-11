@@ -1,4 +1,6 @@
-default["consul"]["user"] = "consul"
-default["consul"]["group"] = "consul"
-default["consul"]["logdir"] = "/var/log/consul"
+default["consul"]["user"] = "root"
+default["consul"]["group"] = "root"
 default["consul"]["confdir"] = "/etc/consul"
+default["consul"]["datadir"] = "/tmp/consul"
+default["consul"]["dns_local_ip"] = ""
+default["consul"]["configured"] = false
