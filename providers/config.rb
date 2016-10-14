@@ -93,7 +93,7 @@ action :add do
     end
 
     node.set["consul"]["is_server"] = is_server
-    node.default["consul"]["configured"] = true
+    node.set["consul"]["configured"] = true
 
     Chef::Log.info("Consul has been configured correctly.")
   rescue => e
@@ -142,6 +142,8 @@ action :remove do
     yum_package 'consul' do
       action :remove
     end
+
+    node.set["consul"]["configured"] = false
 
     Chef::Log.info("Consul has been removed correctly.")
   rescue => e

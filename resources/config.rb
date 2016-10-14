@@ -3,7 +3,7 @@
 # Resource:: config
 #
 
-actions :add, :remove
+actions :add, :remove, :install
 default_action :add
 
 attribute :user, :kind_of => String, :default => "root"
@@ -17,4 +17,4 @@ attribute :cdomain, :kind_of => String, :default => "redborder.cluster"
 
 attribute :dns_local_ip, :kind_of => String
 
-attribute :is_server, :kind_of => Boolean
+attribute :is_server, :kind_of => [TrueClass, FalseClass]
