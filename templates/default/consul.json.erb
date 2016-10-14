@@ -14,5 +14,6 @@
   <% else %>
   "start_join" : <%= @server_list %>,
   <% end %>
-  "recursors" : [ "<%= @dns_local_ip %>" ]
+  "recursors" : [ "<%= @dns_local_ip %>" ],
+  "leave_on_terminate": true
 }
