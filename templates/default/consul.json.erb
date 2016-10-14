@@ -3,7 +3,7 @@
   "data_dir": "<%= @datadir %>",
   "log_level": "INFO",
   "node_name": "<%= @hostname %>",
-  "server": true,
+  "server": <%= @is_server %>,
   "bind_addr" : "<%= @ipaddress %>",
   "client_addr" : "0.0.0.0",
   "ports" : {

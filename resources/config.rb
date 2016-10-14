@@ -16,3 +16,5 @@ attribute :ipaddress, :kind_of => String, :default => "0.0.0.0"
 attribute :cdomain, :kind_of => String, :default => "redborder.cluster"
 
 attribute :dns_local_ip, :kind_of => String
+
+attribute :is_server, :kind_of => Boolean
