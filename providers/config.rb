@@ -54,7 +54,7 @@ action :add do
     is_server ? bootstrap = system('serf members -tag leader="ready|inprogress" | grep $(hostname -s) &> /dev/null') : bootstrap = false
 
     # Check local DNS address
-    current_dns = `cat /etc/resolv.conf | grep nameserver | head -n1 | awk {'print $2'}`.chomp
+    current_dns = `cat /etc/resolv.conf.init /etc/resolv.conf 2>/dev/null | grep nameserver | head -n1 | awk {'print $2'}`.chomp
 
     if current_dns != ipaddress
       node.set["consul"]["dns_local_ip"] = current_dns
