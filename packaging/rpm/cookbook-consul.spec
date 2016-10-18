@@ -20,6 +20,7 @@ Source0: %{name}-%{version}.tar.gz
 mkdir -p %{buildroot}/var/chef/cookbooks/consul
 cp -f -r  resources/* %{buildroot}/var/chef/cookbooks/consul/
 chmod -R 0755 %{buildroot}/var/chef/cookbooks/consul
+install -D -m 0644 README.md %{buildroot}/var/chef/cookbooks/consul/README.md
 
 %pre
 
@@ -28,7 +29,8 @@ chmod -R 0755 %{buildroot}/var/chef/cookbooks/consul
 %files
 %defattr(0755,root,root)
 /var/chef/cookbooks/consul
-
+%defattr(0644,root,root)
+/var/chef/cookbooks/consul/README.md
 %doc
 
 %changelog
