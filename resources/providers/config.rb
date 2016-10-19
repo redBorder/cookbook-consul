@@ -63,7 +63,7 @@ action :add do
     dns_local_ip = node["consul"]["dns_local_ip"]
 
     # Calculate consul server list using serf
-    server_list = `serf members -tag consul=ready -format=json | jq [.members[].addr] | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
+    server_list = `serf members -tag consul=ready -format=json | jq [.members[].addr] 2>/dev/null | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
 
     if is_server or (!is_server and there_are_servers)
 
@@ -97,10 +97,10 @@ action :add do
       end
 
       # Check if chef server is registered to delete chef in /etc/hosts
-      "null" == `curl #{node[ipaddress]}:8500/v1/catalog/services 2> /dev/null | jq .erchef` ? chef_registered = false : chef_registered = true
+      "null" == `curl #{node[ipaddress]}:8500/v1/catalog/services 2>/dev/null | jq .erchef` ? chef_registered = false : chef_registered = true
       if chef_registered
         execute 'Stopping default private-chef-server services' do
-          command 'sed -i 's/.*erchef.*//g' /etc/hosts'
+          command "sed -i 's/.*erchef.*//g' /etc/hosts"
         end
       end
 
