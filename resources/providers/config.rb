@@ -29,7 +29,6 @@ action :install do
       action :create
     end
 
-    Chef::Log.info("Consul has been installed correctly.")
   rescue => e
     Chef::Log.error(e.message)
   end
@@ -97,10 +96,17 @@ action :add do
       end
 
       # Check if chef server is registered to delete chef in /etc/hosts
-      "null" == `curl #{node[ipaddress]}:8500/v1/catalog/services 2>/dev/null | jq .erchef` ? chef_registered = false : chef_registered = true
+      consul_response = `curl #{node["ipaddress"]}:8500/v1/catalog/services 2>/dev/null | jq .erchef`
+      (consul_response == "null\n" or consul_response == "") ? chef_registered = false : chef_registered = true
       if chef_registered
-        execute 'Stopping default private-chef-server services' do
+        execute 'Removing chef service from /etc/hosts' do
           command "sed -i 's/.*erchef.*//g' /etc/hosts"
+        end
+      end
+
+      if is_server
+        execute 'Set consul ready' do
+          command "serf tags -set consul=ready"
         end
       end
 
@@ -111,7 +117,7 @@ action :add do
 
     node.set["consul"]["is_server"] = is_server
 
-    Chef::Log.info("Consul has been configured correctly.")
+    Chef::Log.info("Consul cookbook has been processed")
   rescue => e
     Chef::Log.error(e.message)
   end
@@ -161,7 +167,7 @@ action :remove do
 
     node.set["consul"]["configured"] = false
 
-    Chef::Log.info("Consul has been removed correctly.")
+    Chef::Log.info("Consul cookbook has been processed")
   rescue => e
     Chef::Log.error(e.message)
   end
