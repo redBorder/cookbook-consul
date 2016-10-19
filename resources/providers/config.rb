@@ -50,46 +50,64 @@ action :add do
       action :install
     end
 
-    # Determine if current node is leader
-    is_server ? bootstrap = system('serf members -tag leader="ready|inprogress" | grep $(hostname -s) &> /dev/null') : bootstrap = false
+    #Check if there are servers
+    there_are_servers = system('serf members -tag consul=ready | grep consul=ready &> /dev/null')    
 
-    # Check local DNS address
-    current_dns = `cat /etc/resolv.conf.init /etc/resolv.conf 2>/dev/null | grep nameserver | head -n1 | awk {'print $2'}`.chomp
+    # Determine if current node must be in bootstrap mode. If there are any consul configured, bootstrap false.
+    # If not, bootstrap must be true.
+    is_server ? bootstrap = !there_are_servers : bootstrap = false
+    
+    # Update DNS provided by dhclient
+    current_dns = `cat /etc/redborder/original_resolv.conf /etc/resolv.conf 2>/dev/null | grep nameserver | head -n1 | awk {'print $2'}`.chomp
+    node.set["consul"]["dns_local_ip"] = current_dns
+    dns_local_ip = node["consul"]["dns_local_ip"]
 
-    if current_dns != ipaddress
-      node.set["consul"]["dns_local_ip"] = current_dns
-      dns_local_ip = node["consul"]["dns_local_ip"]
-    end
 
-    server_list = `serf members -tag bootstrap=ready -format=json | jq [.members[].addr] | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
+    # Calculate consul server list using serf
+    server_list = `serf members -tag consul=ready -format=json | jq [.members[].addr] | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
 
-    template "#{confdir}/consul.json" do
-      source "consul.json.erb"
-      cookbook "consul"
-      owner user
-      group group
-      mode 0644
-      retries 2
-      variables(:cdomain => cdomain, :datadir => datadir, :hostname => node["hostname"], :is_server => is_server, \
-        :ipaddress => ipaddress, :bootstrap => bootstrap, :server_list => server_list, :dns_local_ip => dns_local_ip)
-      notifies :reload, "service[consul]"
-    end
+    if is_server or (!is_server and there_are_servers)   
 
-    template "/etc/resolv.conf" do
-      source "resolv.conf.erb"
-      cookbook "consul"
-      owner user
-      group group
-      mode 0644
-      retries 2
-      variables(:cdomain => cdomain, :dns_ip => ipaddress)
-    end
+        template "#{confdir}/consul.json" do
+          source "consul.json.erb"
+          cookbook "consul"
+          owner user
+          group group
+          mode 0644
+          retries 2
+          variables(:cdomain => cdomain, :datadir => datadir, :hostname => node["hostname"], :is_server => is_server, \
+            :ipaddress => ipaddress, :bootstrap => bootstrap, :server_list => server_list, :dns_local_ip => dns_local_ip)
+          notifies :reload, "service[consul]"
+        end
 
-    service "consul" do
-      service_name "consul"
-      ignore_failure true
-      supports :status => true, :reload => true, :restart => true, :enable => true
-      action [:enable,:start]
+        template "/etc/resolv.conf" do
+          source "resolv.conf.erb"
+          cookbook "consul"
+          owner user
+          group group
+          mode 0644
+          retries 2
+          variables(:cdomain => cdomain, :dns_ip => ipaddress)
+        end
+
+        service "consul" do
+          service_name "consul"
+          ignore_failure true
+          supports :status => true, :reload => true, :restart => true, :enable => true
+          action [:enable,:start]
+        end
+        
+        # Check if chef server is registered to delete chef in /etc/hosts
+        "null" == `curl 10.0.203.2:8500/v1/catalog/services 2> /dev/null | jq .erchef` ? chef_registered = false : chef_registered = true
+        if chef_registered
+            execute 'Stopping default private-chef-server services' do
+                command 'sed -i 's/.*erchef.*//g' /etc/hosts'
+            end 
+        end
+
+
+    else
+        Chef::Log.info("Skipping consul configuration, there aren't any consul server yet")
     end
 
     node.set["consul"]["is_server"] = is_server
