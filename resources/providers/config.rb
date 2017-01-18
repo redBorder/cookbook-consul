@@ -143,12 +143,12 @@ action :remove do
       confdir
     ]
 
-    dir_list.each do |dir|
-      directory dir do
-        recursive true
-        action :delete
-      end
-    end
+    #dir_list.each do |dir|
+    #  directory dir do
+    #    recursive true
+    #    action :delete
+    #  end
+    #end
 
     template "/etc/resolv.conf" do
       source "resolv.conf.erb"
@@ -161,9 +161,9 @@ action :remove do
     end
 
     # removing package
-    yum_package 'consul' do
-      action :remove
-    end
+    #yum_package 'consul' do
+    #  action :remove
+    #end
 
     node.set["consul"]["configured"] = false
 
