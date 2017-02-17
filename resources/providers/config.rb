@@ -3,6 +3,8 @@
 # Provider:: config
 #
 
+extend Consul::Helpers
+
 action :install do
   begin
     user = new_resource.user
@@ -96,18 +98,29 @@ action :add do
         action [:enable,:start]
       end
 
+      if is_server
+        execute 'Set consul ready' do
+          command "serf tags -set consul=ready"
+        end
+      end
+
       # Check if chef server is registered to delete chef in /etc/hosts
-      consul_response = `curl #{node["ipaddress"]}:8500/v1/catalog/services 2>/dev/null | jq .erchef`
-      (consul_response == "null\n" or consul_response == "") ? chef_registered = false : chef_registered = true
-      if chef_registered
+
+      if service_registered? ("erchef")
         execute 'Removing chef service from /etc/hosts' do
           command "sed -i 's/.*erchef.*//g' /etc/hosts"
         end
       end
 
-      if is_server
-        execute 'Set consul ready' do
-          command "serf tags -set consul=ready"
+      if service_registered? ("s3")
+        execute 'Removing s3 service from /etc/hosts' do
+          command "sed -i 's/.*s3.*//g' /etc/hosts"
+        end
+      end
+
+      if service_registered? ("postgresql")
+        execute 'Removing postgresql service from /etc/hosts' do
+          command "sed -i 's/.*postgresql.*//g' /etc/hosts"
         end
       end
 
