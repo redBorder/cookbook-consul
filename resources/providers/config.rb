@@ -42,6 +42,7 @@ action :add do
     cdomain = new_resource.cdomain
     dns_local_ip = new_resource.dns_local_ip
     is_server = new_resource.is_server
+    log_level = new_resource.log_level
 
     consul_config "Install consul package" do
       confdir node["consul"]["confdir"]
@@ -74,7 +75,7 @@ action :add do
         mode 0644
         retries 2
         variables(:cdomain => cdomain, :datadir => datadir, :hostname => node["hostname"], :is_server => is_server, \
-          :ipaddress => ipaddress, :bootstrap => bootstrap, :server_list => server_list, :dns_local_ip => dns_local_ip)
+          :ipaddress => ipaddress, :bootstrap => bootstrap, :server_list => server_list, :dns_local_ip => dns_local_ip, :log_level => log_level)
         notifies :reload, "service[consul]"
       end
 
