@@ -3,7 +3,7 @@
 # Provider:: config
 #
 
-extend Consul::Helpers
+extend Consul::Helper
 
 action :install do
   begin
