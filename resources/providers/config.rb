@@ -62,6 +62,7 @@ action :add do
     RBETC = ENV['RBETC'].nil? ? '/etc/redborder' : ENV['RBETC']
     INITCONF="#{RBETC}/rb_init_conf.yml"
     init_conf = YAML.load_file(INITCONF)
+    network = init_conf['network']
     current_dns = network['dns'].nil? ? `cat /etc/redborder/original_resolv.conf /etc/resolv.conf 2>/dev/null | grep nameserver | awk {'print $2'}`.split("\n") : network['dns']
     node.set["consul"]["dns_local_ip"] = current_dns
     dns_local_ip = node["consul"]["dns_local_ip"]
