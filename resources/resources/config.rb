@@ -15,7 +15,7 @@ attribute :datadir, :kind_of => String, :default => "/tmp/consul"
 attribute :ipaddress, :kind_of => String, :default => "0.0.0.0"
 attribute :cdomain, :kind_of => String, :default => "redborder.cluster"
 
-attribute :dns_local_ip, :kind_of => String
+attribute :dns_local_ip, :kind_of => Array
 
 attribute :is_server, :kind_of => [TrueClass, FalseClass]
 

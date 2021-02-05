@@ -58,7 +58,11 @@ action :add do
     is_server ? bootstrap = !there_are_servers : bootstrap = false
 
     # Update DNS provided by dhclient
-    current_dns = `cat /etc/redborder/original_resolv.conf /etc/resolv.conf 2>/dev/null | grep nameserver | head -n1 | awk {'print $2'}`.chomp
+    # Check if DNS was configured in the wizard..
+    RBETC = ENV['RBETC'].nil? ? '/etc/redborder' : ENV['RBETC']
+    INITCONF="#{RBETC}/rb_init_conf.yml"
+    init_conf = YAML.load_file(INITCONF)
+    current_dns = network['dns'].nil? ? `cat /etc/redborder/original_resolv.conf /etc/resolv.conf 2>/dev/null | grep nameserver | awk {'print $2'}`.split("\n") : current_dns  = network['dns']
     node.set["consul"]["dns_local_ip"] = current_dns
     dns_local_ip = node["consul"]["dns_local_ip"]
 
