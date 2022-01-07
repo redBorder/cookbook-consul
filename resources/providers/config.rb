@@ -94,6 +94,16 @@ action :add do
         variables(:cdomain => cdomain, :dns_ip => ipaddress)
       end
 
+      template "/etc/sysconfig/network" do
+        source "network.erb"
+        cookbook "consul"
+        owner user
+        group group
+        mode 0644
+        retries 2
+        variables(:cdomain => cdomain, :dns_ip => ipaddress)
+      end
+      
       service "consul" do
         service_name "consul"
         ignore_failure true

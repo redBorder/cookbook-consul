@@ -44,5 +44,7 @@ esac
 %doc
 
 %changelog
+* Fri Jan 07 2022 David Vanhoucke <dvanhoucke@redborder.com> - 1.0.5-1
+- add /etc/network under control of the chef
 * Tue Oct 18 2016 Alberto Rodríguez <arodriguez@redborder.com> - 1.0.0-1
 - first spec version
