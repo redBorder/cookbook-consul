@@ -4,7 +4,7 @@ Install and configure consul in a redborder environment
 
 ### Platforms
 
-- Centos 7
+- Rocky Linux 9
 
 ### Chef
 
