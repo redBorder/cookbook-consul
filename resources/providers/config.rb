@@ -64,7 +64,7 @@ action :add do
     init_conf = YAML.load_file(INITCONF)
     network = init_conf['network']
     current_dns = network['dns'].nil? ? `cat /etc/redborder/original_resolv.conf /etc/resolv.conf 2>/dev/null | grep nameserver | awk {'print $2'}`.split("\n") : network['dns']
-    node.default["consul"]["dns_local_ip"] = current_dns
+    node.normal["consul"]["dns_local_ip"] = current_dns
     dns_local_ip = node["consul"]["dns_local_ip"]
 
     # Calculate consul server list using serf
@@ -135,12 +135,12 @@ action :add do
         end
       end
 
-      node.default["consul"]["configured"] = true
+      node.normal["consul"]["configured"] = true
     else
         Chef::Log.info("Skipping consul configuration, there aren't any consul server yet")
     end
 
-    node.default["consul"]["is_server"] = is_server
+    node.normal["consul"]["is_server"] = is_server
 
     Chef::Log.info("Consul cookbook has been processed")
   rescue => e
@@ -190,7 +190,7 @@ action :remove do
     #  action :remove
     #end
 
-    node.default["consul"]["configured"] = false
+    node.normal["consul"]["configured"] = false
 
     Chef::Log.info("Consul cookbook has been processed")
   rescue => e
