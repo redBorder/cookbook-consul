@@ -10,7 +10,7 @@ action :install do
     confdir = new_resource.confdir
     datadir = new_resource.datadir
 
-    yum_package "consul" do
+    dnf_package "consul" do
       action :upgrade
       flush_cache [:before]
     end
@@ -64,7 +64,7 @@ action :add do
     init_conf = YAML.load_file(INITCONF)
     network = init_conf['network']
     current_dns = network['dns'].nil? ? `cat /etc/redborder/original_resolv.conf /etc/resolv.conf 2>/dev/null | grep nameserver | awk {'print $2'}`.split("\n") : network['dns']
-    node.set["consul"]["dns_local_ip"] = current_dns
+    node.normal["consul"]["dns_local_ip"] = current_dns
     dns_local_ip = node["consul"]["dns_local_ip"]
 
     # Calculate consul server list using serf
@@ -135,12 +135,12 @@ action :add do
         end
       end
 
-      node.set["consul"]["configured"] = true
+      node.normal["consul"]["configured"] = true
     else
         Chef::Log.info("Skipping consul configuration, there aren't any consul server yet")
     end
 
-    node.set["consul"]["is_server"] = is_server
+    node.normal["consul"]["is_server"] = is_server
 
     Chef::Log.info("Consul cookbook has been processed")
   rescue => e
@@ -186,11 +186,11 @@ action :remove do
     end
 
     # removing package
-    #yum_package 'consul' do
+    #dnf_package 'consul' do
     #  action :remove
     #end
 
-    node.set["consul"]["configured"] = false
+    node.normal["consul"]["configured"] = false
 
     Chef::Log.info("Consul cookbook has been processed")
   rescue => e
