@@ -26,7 +26,6 @@ action :install do
       mode '0770'
       action :create
     end
-
   rescue => e
     Chef::Log.error(e.message)
   end
@@ -53,13 +52,12 @@ action :add do
 
     # Determine if current node must be in bootstrap mode. If there are any consul configured, bootstrap false.
     # If not, bootstrap must be true.
-    is_server ? bootstrap = !there_are_servers : bootstrap = false
+    bootstrap = is_server ? !there_are_servers : false
 
-    # Update DNS provided by dhclient
+    # Update DNS provided by dhclient
     # Check if DNS was configured in the wizard..
     RBETC = ENV['RBETC'].nil? ? '/etc/redborder' : ENV['RBETC']
-    INITCONF="#{RBETC}/rb_init_conf.yml"
-    init_conf = YAML.load_file(INITCONF)
+    init_conf = YAML.load_file("#{RBETC}/rb_init_conf.yml")
     network = init_conf['network']
     current_dns = network['dns'].nil? ? `cat /etc/redborder/original_resolv.conf /etc/resolv.conf 2>/dev/null | grep nameserver | awk {'print $2'}`.split('\n') : network['dns']
     node.normal['consul']['dns_local_ip'] = current_dns
@@ -101,7 +99,7 @@ action :add do
         retries 2
         variables(cdomain: cdomain, dns_ip: ipaddress)
       end
-      
+
       service 'consul' do
         service_name 'consul'
         ignore_failure true
@@ -111,7 +109,7 @@ action :add do
 
       # Check if chef server is registered to delete chef in /etc/hosts
       consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .erchef`
-      (consul_response == 'null\n' || consul_response == '') ? chef_registered = false : chef_registered = true
+      chef_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
       if chef_registered
         execute 'Removing chef service from /etc/hosts' do
           command "sed -i 's/.*erchef.*//g' /etc/hosts"
@@ -120,7 +118,7 @@ action :add do
 
       # Check if postgresql is registered to delete postgresql in /etc/hosts
       consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .postgresql`
-      (consul_response == 'null\n' || consul_response == '') ? postgresql_registered = false : postgresql_registered = true
+      postgresql_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
       if postgresql_registered
         execute 'Removing postgresql service from /etc/hosts' do
           command "sed -i 's/.*postgresql.*//g' /etc/hosts"
@@ -135,7 +133,7 @@ action :add do
 
       node.normal['consul']['configured'] = true
     else
-        Chef::Log.info('Skipping consul configuration, there arent any consul server yet')
+      Chef::Log.info('Skipping consul configuration, there arent any consul server yet')
     end
 
     node.normal['consul']['is_server'] = is_server
@@ -150,8 +148,8 @@ action :remove do
   begin
     user = new_resource.user
     group = new_resource.group
-    confdir = new_resource.confdir
-    datadir = new_resource.datadir
+    # confdir = new_resource.confdir
+    # datadir = new_resource.datadir
     cdomain = new_resource.cdomain
     dns_local_ip = new_resource.dns_local_ip
 
@@ -161,7 +159,7 @@ action :remove do
       action :stop
     end
 
-    dir_list = [datadir, confdir]
+    # dir_list = [datadir, confdir]
 
     # dir_list.each do |dir|
     #   directory dir do
