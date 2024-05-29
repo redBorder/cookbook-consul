@@ -4,9 +4,7 @@ cookbook-consul CHANGELOG
 ## 1.0.8
 
   - Miguel Negrón
-    - [e12e930] Merge pull request #12 from redBorder/improvement/fix_lint
     - [41f14d1] Update metadata.rb
-  - Miguel Negron
     - [3905e91] lint providers 2
     - [feaf559] lint providers
     - [bb4676a] lint resources
