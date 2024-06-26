@@ -12,6 +12,9 @@
   <% if @bootstrap %>
   "bootstrap" : <%= @bootstrap %>,
   <% else %>
+  <% if @server_length == 1 %>
+  "bootstrap_expect" : 1,
+  <% end %>
   "start_join" : <%= @server_list %>,
   <% end %>
   "recursors" : <%= @dns_local_ip %>,
