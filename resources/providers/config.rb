@@ -77,8 +77,7 @@ action :add do
         mode '0644'
         retries 2
         variables(cdomain: cdomain, datadir: datadir, hostname: node['hostname'], is_server: is_server, \
-          ipaddress: ipaddress, bootstrap: bootstrap, server_list: server_list, dns_local_ip: dns_local_ip, log_level: log_level,
-          server_length: server_length)
+          ipaddress: ipaddress, bootstrap: bootstrap, server_list: server_list, dns_local_ip: dns_local_ip, log_level: log_level, server_length: server_length)
         notifies :reload, 'service[consul]'
       end
 
