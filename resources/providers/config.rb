@@ -65,6 +65,7 @@ action :add do
 
     # Calculate consul server list using serf
     server_list = `serf members -tag consul=ready -format=json | jq [.members[].addr] 2>/dev/null | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
+    bootstrap_expect = server_list.length.zero? ? 1 : server_list.length
 
     if is_server || (!is_server && there_are_servers)
 
@@ -76,7 +77,7 @@ action :add do
         mode '0644'
         retries 2
         variables(cdomain: cdomain, datadir: datadir, hostname: node['hostname'], is_server: is_server, \
-          ipaddress: ipaddress, bootstrap: bootstrap, server_list: server_list, dns_local_ip: dns_local_ip, log_level: log_level)
+          ipaddress: ipaddress, bootstrap: bootstrap, server_list: server_list, dns_local_ip: dns_local_ip, log_level: log_level, bootstrap_expect: bootstrap_expect)
         notifies :reload, 'service[consul]'
       end
 
