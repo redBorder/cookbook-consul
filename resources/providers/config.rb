@@ -66,7 +66,7 @@ action :add do
     # Calculate consul server list using serf
     server_list = `serf members -tag consul=ready -format=json | jq [.members[].addr] 2>/dev/null | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
 
-    if is_server || (!is_server && there_are_servers)
+    if is_server || there_are_servers
 
       template "#{confdir}/consul.json" do
         source 'consul.json.erb'
