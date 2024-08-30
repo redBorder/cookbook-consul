@@ -120,8 +120,8 @@ action :add do
       consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .postgresql`
       postgresql_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
       # Postgres should be added to /etc/hosts when there is only 1 node
-      server_members = `serf members -format=json`
-      postgresql_nodes = JSON.parse(server_members) unless server_members.strip.empty?
+      alive_server_members = `serf members -format=json -status=alive`
+      postgresql_nodes = JSON.parse(alive_server_members) unless alive_server_members.strip.empty?
       if postgresql_registered && postgresql_nodes && postgresql_nodes.size > 1
         execute 'Removing postgresql service from /etc/hosts' do
           command "sed -i 's/.*postgresql.*//g' /etc/hosts"
