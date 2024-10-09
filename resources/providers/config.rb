@@ -124,8 +124,14 @@ action :add do
       data_bag_response = `knife data bag show rBglobal ipvirtual-internal-postgresql 2>/dev/null`
       virtual_ip_present = (data_bag_response.include?('id') && !data_bag_response.include?('id: null')) ? true : false
 
-      # If PostgreSQL is registered in Consul and no virtual IP is set, remove postgresql from /etc/hosts
-      if postgresql_registered && !virtual_ip_present
+      # Get the list of alive server members from Serf
+      alive_server_members = `serf members -format=json -status=alive`
+      postgresql_nodes = JSON.parse(alive_server_members) unless alive_server_members.strip.empty?
+
+      # If all conditions are met /etc/hosts remains
+      if postgresql_registered && virtual_ip_present && postgresql_nodes && postgresql_nodes['members'].size > 1
+        Chef::Log.info('Conditions met, keeping master.postgresql.service in /etc/hosts')
+      else
         execute 'Removing postgresql service from /etc/hosts' do
           command "sed -i 's/.*postgresql.*//g' /etc/hosts"
         end
