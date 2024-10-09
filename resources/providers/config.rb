@@ -122,7 +122,7 @@ action :add do
 
       # Check if the virtual IP field exists in the data bag
       data_bag_response = `knife data bag show rBglobal ipvirtual-internal-postgresql 2>/dev/null`
-      virtual_ip_present = (data_bag_response.include?("id") && !data_bag_response.include?("id: null")) ? true : false
+      virtual_ip_present = (data_bag_response.include?('id') && !data_bag_response.include?('id: null')) ? true : false
 
       # If PostgreSQL is registered in Consul and no virtual IP is set, remove postgresql from /etc/hosts
       if postgresql_registered && !virtual_ip_present
