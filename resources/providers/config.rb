@@ -116,10 +116,16 @@ action :add do
         end
       end
 
-      # Check if postgresql is registered to delete postgresql in /etc/hosts
+      # Check if postgresql is registered in Consul
       consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .postgresql`
       postgresql_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
-      if postgresql_registered
+
+      # Check if the virtual IP field exists in the data bag
+      data_bag_response = `knife data bag show rBglobal ipvirtual-internal-postgresql 2>/dev/null`
+      virtual_ip_present = (data_bag_response.include?("id") && !data_bag_response.include?("id: null")) ? true : false
+
+      # If PostgreSQL is registered in Consul and no virtual IP is set, remove postgresql from /etc/hosts
+      if postgresql_registered && !virtual_ip_present
         execute 'Removing postgresql service from /etc/hosts' do
           command "sed -i 's/.*postgresql.*//g' /etc/hosts"
         end
