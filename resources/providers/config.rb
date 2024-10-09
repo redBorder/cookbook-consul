@@ -122,16 +122,14 @@ action :add do
 
       # Check if the virtual IP field exists in the data bag
       data_bag_response = `knife data bag show rBglobal ipvirtual-internal-postgresql 2>/dev/null`
-      virtual_ip_present = (data_bag_response.include?('id') && !data_bag_response.include?('id: null')) ? true : false
+      virtual_ip_present = (data_bag_response.include?('ip:')) ? true : false
 
       # Get the list of alive server members from Serf
       alive_server_members = `serf members -format=json -status=alive`
       postgresql_nodes = JSON.parse(alive_server_members) unless alive_server_members.strip.empty?
 
-      # If all conditions are met /etc/hosts remains
-      if postgresql_registered && virtual_ip_present && postgresql_nodes && postgresql_nodes['members'].size > 1
-        Chef::Log.info('Conditions met, keeping master.postgresql.service in /etc/hosts')
-      else
+      # If all conditions are met /etc/hosts will be removed
+      if postgresql_registered && !virtual_ip_present && postgresql_nodes['members'].size == 1
         execute 'Removing postgresql service from /etc/hosts' do
           command "sed -i 's/.*postgresql.*//g' /etc/hosts"
         end
