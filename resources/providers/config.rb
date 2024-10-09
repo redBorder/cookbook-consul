@@ -122,7 +122,7 @@ action :add do
 
       # Check if the virtual IP field exists in the data bag
       data_bag_response = `knife data bag show rBglobal ipvirtual-internal-postgresql 2>/dev/null`
-      virtual_ip_present = (data_bag_response.include?('ip:')) ? true : false
+      virtual_ip_present = data_bag_response.include?('ip:') ? true : false
 
       # Get the list of alive server members from Serf
       alive_server_members = `serf members -format=json -status=alive`
