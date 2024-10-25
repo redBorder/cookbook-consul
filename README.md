@@ -1,4 +1,15 @@
-# consul Cookbook
+# cookbook-consul
+[![Build Status][build-shield]][build-url]
+[![Linters][linters-shield]][linters-url]
+[![License][license-shield]][license-url]
+
+<!-- Badges -->
+[build-shield]: https://github.com/redBorder/cookbook-consul/actions/workflows/rpm.yml/badge.svg?branch=master
+[build-url]: https://github.com/redBorder/cookbook-consul/actions/workflows/rpm.yml?query=branch%3Amaster
+[linters-shield]: https://github.com/redBorder/cookbook-consul/actions/workflows/lint.yml/badge.svg?event=push
+[linters-url]: https://github.com/redBorder/cookbook-consul/actions/workflows/lint.yml
+[license-shield]: https://img.shields.io/badge/license-AGPLv3-blue.svg
+[license-url]: https://github.com/cookbook-consul/blob/HEAD/LICENSE
 
 Install and configure consul in a redborder environment
 
@@ -8,7 +19,7 @@ Install and configure consul in a redborder environment
 
 ### Chef
 
-- Chef 12.0 or later
+- Chef 15.7.0 or later
 
 ## Contributing
 
@@ -20,9 +31,5 @@ Install and configure consul in a redborder environment
 6. Submit a Pull Request using Github
 
 ## License
-GNU AFFERO GENERAL PUBLIC LICENSE
-Version 3, 19 November 2007
 
-## Authors
-- Carlos J. Mateos <cjmateos@redborder.com>
-- Alberto Rodríguez <arodriguez@redborder.com>
+GNU AFFERO GENERAL PUBLIC LICENSE Version 3, 19 November 2007

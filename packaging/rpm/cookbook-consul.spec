@@ -23,6 +23,9 @@ chmod -R 0755 %{buildroot}/var/chef/cookbooks/consul
 install -D -m 0644 README.md %{buildroot}/var/chef/cookbooks/consul/README.md
 
 %pre
+if [ -d /var/chef/cookbooks/consul ]; then
+    rm -rf /var/chef/cookbooks/consul
+fi
 
 %post
 case "$1" in
@@ -36,6 +39,12 @@ case "$1" in
   ;;
 esac
 
+%postun
+# Deletes directory when uninstall the package
+if [ "$1" = 0 ] && [ -d /var/chef/cookbooks/consul ]; then
+  rm -rf /var/chef/cookbooks/consul
+fi
+
 %files
 %defattr(0755,root,root)
 /var/chef/cookbooks/consul
@@ -44,7 +53,11 @@ esac
 %doc
 
 %changelog
-* Fri Jan 07 2022 David Vanhoucke <dvanhoucke@redborder.com> - 1.0.5-1
+* Thu Oct 10 2024 Miguel Negrón <manegron@redborder.com>
+- Add pre and postun
+
+* Fri Jan 07 2022 David Vanhoucke <dvanhoucke@redborder.com>
 - add /etc/network under control of the chef
-* Tue Oct 18 2016 Alberto Rodríguez <arodriguez@redborder.com> - 1.0.0-1
+
+* Tue Oct 18 2016 Alberto Rodríguez <arodriguez@redborder.com>
 - first spec version

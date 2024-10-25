@@ -1,6 +1,22 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 1.0.9
+
+  - Miguel Negrón
+    - [82e0600] Add pre and postun to clean the cookbook
+    - [610a7ad] Update README.md
+    - [a104e0e] Merge pull request #14 from redBorder/master
+  - Daniel Castro
+    - [811c570] Merge pull request #15 from redBorder/bugfix/17870_add_bootstrap_expect_in_1consul_node_setup
+  - nilsver
+    - [bd7f183] add bootstrap_expect line
+    - [73978a0] refactor
+    - [436f653] add configuration for 1 node setup
+  - Miguel Negrón
+    - [610a7ad] Update README.md
+    - [a104e0e] Merge pull request #14 from redBorder/master
+
 ## 1.0.8
 
   - Miguel Negrón
