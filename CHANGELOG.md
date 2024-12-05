@@ -3,8 +3,6 @@ cookbook-consul CHANGELOG
 
 ## 1.0.10
 
-  - nilsver
-    - [5938509] Merge pull request #18 from redBorder/bugfix/#19348_migrate_fails_during_installation
   - Rafael Gomez
     - [3dd3f4c] If the leader=inprogress tag is present, the script skips the removal.
 
