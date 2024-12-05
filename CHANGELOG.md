@@ -1,6 +1,11 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 1.0.10
+
+  - Rafael Gomez
+    - [3dd3f4c] If the leader=inprogress tag is present, the script skips the removal.
+
 ## 1.0.9
 
   - Miguel Negrón
