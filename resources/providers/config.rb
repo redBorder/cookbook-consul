@@ -136,7 +136,7 @@ action :add do
         command 'serf tags -set consul=ready'
       end
     end
-    
+
     node.normal['consul']['is_server'] = is_server
     node.normal['consul']['configured'] = true
 
