@@ -28,5 +28,14 @@ module Consul
         recursive true
       end
     end
+
+    def get_server_count
+      server_count = `serf members -tag consul=ready -format=json | jq -r '.members[].addr | split(":")[0]' | wc -l`.to_i
+      server_count.zero? ? 1 : server_count
+    end
+
+    def get_server_list
+      `serf members -tag consul=ready -format=json | jq -r '.members[].addr | split(":")[0]'`.split("\n")
+    end
   end
 end

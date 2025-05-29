@@ -59,8 +59,8 @@ action :add do
     dns_local_ip = node['consul']['dns_local_ip']
 
     # Calculate consul server list using serf
-    server_list = `serf members -tag consul=ready -format=json | jq [.members[].addr] 2>/dev/null | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
-    bootstrap_expect = server_list.length.zero? ? 1 : server_list.length
+    server_list = get_server_list
+    bootstrap_expect = get_server_count
 
     if ::Dir.exist?('/tmp/consul')
       migrate_consul_config("#{confdir}/consul.json", '/tmp/consul', datadir)
