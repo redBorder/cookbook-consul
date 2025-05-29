@@ -1,6 +1,8 @@
 # Cookbook:: consul
 # Provider:: config
 
+include Consul::Helper
+
 action :install do
   begin
     user = new_resource.user
@@ -50,10 +52,6 @@ action :add do
     # Check if there are consul servers
     there_are_servers = system('serf members -tag consul=ready | grep consul=ready &> /dev/null')
 
-    # Determine if current node must be in bootstrap mode. If there are any consul configured, bootstrap false.
-    # If not, bootstrap must be true.
-    bootstrap = is_server ? !there_are_servers : false
-
     # Update DNS provided by dhclient
     # Check if DNS was configured in the wizard..
     RBETC = ENV['RBETC'].nil? ? '/etc/redborder' : ENV['RBETC']
@@ -67,82 +65,80 @@ action :add do
     server_list = `serf members -tag consul=ready -format=json | jq [.members[].addr] 2>/dev/null | sed 's/:[[:digit:]]\\+//' | tr -d '\n'`
     bootstrap_expect = server_list.length.zero? ? 1 : server_list.length
 
-    if is_server || (!is_server && there_are_servers)
-
-      template "#{confdir}/consul.json" do
-        source 'consul.json.erb'
-        cookbook 'consul'
-        owner user
-        group group
-        mode '0644'
-        retries 2
-        variables(cdomain: cdomain, datadir: datadir, hostname: node['hostname'], is_server: is_server, \
-          ipaddress: ipaddress, bootstrap: bootstrap, server_list: server_list, dns_local_ip: dns_local_ip, log_level: log_level, bootstrap_expect: bootstrap_expect)
-        notifies :reload, 'service[consul]'
-      end
-
-      template '/etc/resolv.conf' do
-        source 'resolv.conf.erb'
-        cookbook 'consul'
-        owner user
-        group group
-        mode '0644'
-        retries 2
-        variables(cdomain: cdomain, dns_ip: ipaddress)
-      end
-
-      template '/etc/sysconfig/network' do
-        source 'network.erb'
-        cookbook 'consul'
-        owner user
-        group group
-        mode '0644'
-        retries 2
-        variables(cdomain: cdomain, dns_ip: ipaddress)
-      end
-
-      service 'consul' do
-        service_name 'consul'
-        ignore_failure true
-        supports status: true, reload: true, restart: true, enable: true
-        action [:enable, :start]
-      end
-
-      # Check if chef server is registered to delete chef in /etc/hosts
-      consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .erchef`
-      chef_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
-      if chef_registered
-        execute 'Removing chef service from /etc/hosts' do
-          command "sed -i 's/.*erchef.*//g' /etc/hosts"
-        end
-      end
-
-      # Check if postgresql is registered to delete postgresql in /etc/hosts
-      consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .postgresql`
-      postgresql_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
-
-      # Check if any serf member has the leader=inprogress tag
-      serf_members_output = `serf members`
-      leader_inprogress = serf_members_output.include?('leader=inprogress')
-
-      if postgresql_registered && !leader_inprogress
-        execute 'Removing postgresql service from /etc/hosts' do
-          command "sed -i 's/.*postgresql.*//g' /etc/hosts"
-        end
-      end
-
-      if is_server
-        execute 'Set consul ready' do
-          command 'serf tags -set consul=ready'
-        end
-      end
-
-      node.normal['consul']['configured'] = true
-    else
-      Chef::Log.info('Skipping consul configuration, there arent any consul server yet')
+    if ::Dir.exist?('/tmp/consul')
+      migrate_consul_config("#{confdir}/consul.json", '/tmp/consul', datadir)
     end
 
+    template "#{confdir}/consul.json" do
+      source 'consul.json.erb'
+      cookbook 'consul'
+      owner user
+      group group
+      mode '0644'
+      retries 2
+      variables(cdomain: cdomain, datadir: datadir, hostname: node['hostname'], is_server: is_server, \
+        ipaddress: ipaddress, server_list: server_list, dns_local_ip: dns_local_ip, log_level: log_level, bootstrap_expect: bootstrap_expect)
+      notifies :restart, 'service[consul]'
+    end
+
+    template '/etc/resolv.conf' do
+      source 'resolv.conf.erb'
+      cookbook 'consul'
+      owner user
+      group group
+      mode '0644'
+      retries 2
+      variables(cdomain: cdomain, dns_ip: ipaddress)
+    end
+
+    template '/etc/sysconfig/network' do
+      source 'network.erb'
+      cookbook 'consul'
+      owner user
+      group group
+      mode '0644'
+      retries 2
+      variables(cdomain: cdomain, dns_ip: ipaddress)
+    end
+
+    service 'consul' do
+      service_name 'consul'
+      ignore_failure true
+      supports status: true, reload: true, restart: true, enable: true
+      action [:enable, :start]
+    end
+
+    # Check if chef server is registered to delete chef in /etc/hosts
+    consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .erchef`
+    chef_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
+    if chef_registered
+      execute 'Removing chef service from /etc/hosts' do
+        command "sed -i 's/.*erchef.*//g' /etc/hosts"
+      end
+    end
+
+    # Check if postgresql is registered to delete postgresql in /etc/hosts
+    consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .postgresql`
+    postgresql_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
+
+    # Check if any serf member has the leader=inprogress tag
+    serf_members_output = `serf members`
+    leader_inprogress = serf_members_output.include?('leader=inprogress')
+
+    if postgresql_registered && !leader_inprogress
+      execute 'Removing postgresql service from /etc/hosts' do
+        command "sed -i 's/.*postgresql.*//g' /etc/hosts"
+      end
+    end
+
+    if is_server
+      execute 'Set consul ready' do
+        command 'serf tags -set consul=ready'
+      end
+    end
+    
     node.normal['consul']['is_server'] = is_server
+    node.normal['consul']['configured'] = true
 
     Chef::Log.info('Consul cookbook has been processed')
   rescue => e
