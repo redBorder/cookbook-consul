@@ -1,6 +1,6 @@
 module Consul
   module Helper
-    def migrate_consul_config(config_file, old_dir, new_dir)
+    def migrate_consul_config(consul_config_file, old_dir, new_dir)
       service 'consul' do
         action :stop
       end
@@ -10,10 +10,10 @@ module Consul
         only_if { ::Dir.exist?(old_dir) && !Dir.empty?(old_dir) }
       end
 
-      def update_config_file(config_file, old_dir, new_dir)
-        ruby_block "update_#{config_file}_datadir" do
+      def update_config_file(consul_config_file, old_dir, new_dir)
+        ruby_block "update_#{consul_config_file}_datadir" do
           block do
-            file = Chef::Util::FileEdit.new(config_file)
+            file = Chef::Util::FileEdit.new(consul_config_file)
             file.search_file_replace(/"data_dir":\s*"#{Regexp.escape(old_dir)}"/, "\"data_dir\": \"#{new_dir}\"")
             file.write_file
           end
