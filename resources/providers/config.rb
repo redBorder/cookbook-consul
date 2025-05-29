@@ -49,9 +49,6 @@ action :add do
       action :install
     end
 
-    # Check if there are consul servers
-    there_are_servers = system('serf members -tag consul=ready | grep consul=ready &> /dev/null')
-
     # Update DNS provided by dhclient
     # Check if DNS was configured in the wizard..
     RBETC = ENV['RBETC'].nil? ? '/etc/redborder' : ENV['RBETC']
