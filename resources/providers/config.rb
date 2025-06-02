@@ -58,6 +58,12 @@ action :add do
     node.normal['consul']['dns_local_ip'] = current_dns
     dns_local_ip = node['consul']['dns_local_ip']
 
+    if is_server
+      execute 'Set consul ready' do
+        command 'serf tags -set consul=ready'
+      end
+    end
+
     # Calculate consul server list using serf
     server_list = get_server_list
     bootstrap_expect = get_server_count
@@ -125,12 +131,6 @@ action :add do
     if postgresql_registered && !leader_inprogress
       execute 'Removing postgresql service from /etc/hosts' do
         command "sed -i 's/.*postgresql.*//g' /etc/hosts"
-      end
-    end
-
-    if is_server
-      execute 'Set consul ready' do
-        command 'serf tags -set consul=ready'
       end
     end
 
