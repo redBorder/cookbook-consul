@@ -35,7 +35,7 @@ module Consul
     end
 
     def get_server_list
-      `serf members -tag consul=ready -format=json | jq -r '.members[].addr | split(":")[0]'`.split("\n")
+      `serf members -tag consul=ready -format=json | jq -r '.members[].addr | split(":")[0]'`.split("\n").sort
     end
   end
 end
