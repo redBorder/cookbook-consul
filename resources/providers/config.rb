@@ -62,6 +62,10 @@ action :add do
       execute 'Set consul ready' do
         command 'serf tags -set consul=ready'
       end
+    else
+      execute 'Unset consul ready' do
+        command 'serf tags -delete consul'
+      end
     end
 
     # Calculate consul server list using serf
