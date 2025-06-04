@@ -91,7 +91,7 @@ action :add do
       group group
       mode '0644'
       retries 2
-      variables(cdomain: cdomain, dns_ip: ipaddress)
+      variables(cdomain: cdomain, dns_ip: ipaddress, is_server: is_server, server_list: server_list)
     end
 
     template '/etc/sysconfig/network' do
@@ -101,7 +101,7 @@ action :add do
       group group
       mode '0644'
       retries 2
-      variables(cdomain: cdomain, dns_ip: ipaddress)
+      variables(cdomain: cdomain, dns_ip: ipaddress, is_server: is_server, server_list: server_list)
     end
 
     service 'consul' do
