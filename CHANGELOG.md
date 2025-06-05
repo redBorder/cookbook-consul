@@ -1,6 +1,11 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 2.0.0
+
+  - Rafael Gomez
+    - [c1ed7bf] Refactor consul configuration logic
+
 ## 1.0.10
 
   - Rafael Gomez

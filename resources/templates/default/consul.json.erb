@@ -9,11 +9,10 @@
   "ports": {
     "dns": 53
   },
-  <% if @bootstrap %>
+  <% if @is_server %>
   "bootstrap_expect": <%= @bootstrap_expect %>,
-  <% else %>
-  "retry_join": <%= @server_list %>,
   <% end %>
+  "retry_join": <%= @server_list %>,
   "recursors": <%= @dns_local_ip %>,
   "leave_on_terminate": true,
   "enable_script_checks": true
