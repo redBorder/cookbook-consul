@@ -1,6 +1,11 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 2.0.1
+
+  - Rafael Gomez
+    - [cfddfdc] Refactor chef service removal logic to check for leader inprogress status
+
 ## 2.0.0
 
   - Rafael Gomez
