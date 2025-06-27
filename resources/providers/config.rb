@@ -12,7 +12,6 @@ action :install do
 
     dnf_package 'consul' do
       action :upgrade
-      flush_cache [:before]
     end
 
     directory confdir do
