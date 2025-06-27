@@ -1,6 +1,11 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 2.0.2
+
+  - nilsver
+    - [6723280] remove flush cache
+
 ## 2.0.1
 
   - Rafael Gomez
