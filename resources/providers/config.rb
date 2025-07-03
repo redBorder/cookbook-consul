@@ -12,7 +12,6 @@ action :install do
 
     dnf_package 'consul' do
       action :upgrade
-      flush_cache [:before]
     end
 
     directory confdir do
@@ -115,10 +114,14 @@ action :add do
       action [:enable, :start]
     end
 
+    # Check if any serf member has the leader=inprogress tag
+    serf_members_output = `serf members`
+    leader_inprogress = serf_members_output.include?('leader=inprogress')
+
     # Check if chef server is registered to delete chef in /etc/hosts
     consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .erchef`
     chef_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
-    if chef_registered
+    if chef_registered && !leader_inprogress
       execute 'Removing chef service from /etc/hosts' do
         command "sed -i 's/.*erchef.*//g' /etc/hosts"
       end
