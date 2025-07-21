@@ -127,16 +127,6 @@ action :add do
       end
     end
 
-    # Check if postgresql is registered to delete postgresql in /etc/hosts
-    consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .postgresql`
-    postgresql_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
-
-    if postgresql_registered && !leader_inprogress
-      execute 'Removing postgresql service from /etc/hosts' do
-        command "sed -i 's/.*postgresql.*//g' /etc/hosts"
-      end
-    end
-
     node.normal['consul']['is_server'] = is_server
     node.normal['consul']['configured'] = true
 
