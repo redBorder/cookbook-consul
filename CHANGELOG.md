@@ -3,20 +3,10 @@ cookbook-consul CHANGELOG
 
 ## 2.1.0
 
-  - Luis Blanco
-    - [6ee5cb7] Merge pull request #17 from redBorder/feature/#18850_add_internal_virtual_ips
   - Rafael Gomez
-    - [9cdf05c] Merge branch 'master' into feature/#18850_add_internal_virtual_ips
-    - [22093ef] Merge branch 'master' into feature/#18850_add_internal_virtual_ips
-    - [7b511d1] Merge remote-tracking branch 'origin/master' into feature/#18850_add_internal_virtual_ips
-    - [39be65d] Merge branch 'master' into feature/#18850_add_internal_virtual_ips
-    - [d22d8a5] postgres service /etc/hosts will be there forever
-    - [f3ab46b] fix linter
     - [caa8dfa] fixing condition and virtual_ip_present
     - [22c7e7b] If there is more than two nodes /etc/hosts remains condition added
     - [c2bd708] Removing postgresql service from /etc/hosts only if service consul is registred and virtual IP is not present
-  - Rafa Gómez
-    - [af1d75c] Fix linter
 
 ## 2.0.2
 
