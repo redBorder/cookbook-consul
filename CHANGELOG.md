@@ -1,6 +1,13 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 2.1.0
+
+  - Rafael Gomez
+    - [caa8dfa] fixing condition and virtual_ip_present
+    - [22c7e7b] If there is more than two nodes /etc/hosts remains condition added
+    - [c2bd708] Removing postgresql service from /etc/hosts only if service consul is registred and virtual IP is not present
+
 ## 2.0.2
 
   - nilsver
