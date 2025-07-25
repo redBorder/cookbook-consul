@@ -1,6 +1,11 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 2.1.1
+
+  - jnavarrorb
+    - [1088e47] Remove executable permissions on non-executable files
+
 ## 2.1.0
 
   - Rafael Gomez
