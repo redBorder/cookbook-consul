@@ -122,8 +122,9 @@ action :add do
     consul_response = `curl #{node['ipaddress']}:8500/v1/catalog/services 2>/dev/null | jq .erchef`
     chef_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
     if chef_registered && !leader_inprogress
+      # Use atomic write to avoid /etc/hosts corruption during concurrent chef-client runs
       execute 'Removing chef service from /etc/hosts' do
-        command "sed -i 's/.*erchef.*//g' /etc/hosts"
+        command "grep -v 'erchef' /etc/hosts > /etc/hosts.tmp && mv /etc/hosts.tmp /etc/hosts"
       end
     end
 
