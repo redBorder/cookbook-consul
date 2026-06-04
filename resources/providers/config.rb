@@ -123,8 +123,9 @@ action :add do
     chef_registered = (consul_response == 'null\n' || consul_response == '') ? false : true
     if chef_registered && !leader_inprogress
       # Use atomic write to avoid /etc/hosts corruption during concurrent chef-client runs
+      # Check if erchef is present, restore SELinux labels and set permissions after write
       execute 'Removing chef service from /etc/hosts' do
-        command "grep -v 'erchef' /etc/hosts > /etc/hosts.tmp && mv /etc/hosts.tmp /etc/hosts"
+        command "grep -q 'erchef' /etc/hosts && grep -v 'erchef' /etc/hosts > /etc/hosts.tmp && chmod 644 /etc/hosts.tmp && mv /etc/hosts.tmp /etc/hosts && restorecon /etc/hosts || true"
       end
     end
 
