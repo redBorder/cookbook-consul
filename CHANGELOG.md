@@ -1,6 +1,12 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 2.1.2
+
+  - aguzman
+    - [148c2b4] fix: check erchef presence, restore SELinux labels and set permissions on /etc/hosts
+    - [f6ed5cf] fix: use atomic write to prevent /etc/hosts corruption during concurrent chef-client runs
+
 ## 2.1.1
 
   - jnavarrorb
