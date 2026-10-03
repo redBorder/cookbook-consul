@@ -1,6 +1,11 @@
 cookbook-consul CHANGELOG
 ===============
 
+## 2.1.3
+
+  - manegron
+    - [85da9c4] Upload cookbook only if opscode-erchef is active
+
 ## 2.1.2
 
   - aguzman
